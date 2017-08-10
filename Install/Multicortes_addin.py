@@ -185,7 +185,6 @@ class ButtonMulticortes(object):
             ruta=easygui.diropenbox("Ruta de Salida: ","Select File",'C:')
         except:
             ruta=pythonaddins.OpenDialog("Ruta de Salida: ")
-            ruta,archi = os.path.split(ruta)
         #tipo_analisis=capstringTK("Seleccione el tipo de análisis 1=Corte y Estadísticas , 2=Solo corte , 3=Extracción por Campo con Estadísticas  : ")
         msg = "Seleccione el tipo de análisis"
         choices = ["Nada","Corte y Estadísticas","Solo corte","Extracción por Campo con Estadísticas"]
