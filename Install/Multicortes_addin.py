@@ -307,7 +307,10 @@ class ButtonMulticortes(object):
                         #Recorrido del Primer Cursor
                         try:
                             for filas in cursor1:
-                            	rango = filas.getValue(campo_estadisticas)
+                                try:
+                                    rango = filas.getValue(campo_estadisticas)
+                                except:
+                                    rango = filas.getValue(campo_estadisticas_tentativo)
                             	valor = filas.getValue("SUM_Shape_Area")
                             	aRangos.append(rango)
                             	aValores.append(valor)
@@ -317,7 +320,10 @@ class ButtonMulticortes(object):
                             nombre_tabla=arreglo_nombre[0]
                             campo_estadisticas=arreglo_nombre[1]
                             for filas in cursor1:
-                            	rango = filas.getValue(campo_estadisticas)
+                                try:
+                                    rango = filas.getValue(campo_estadisticas)
+                                except:
+                                    rango = filas.getValue(campo_estadisticas_tentativo)
                             	valor = filas.getValue("SUM_Shape_Area")
                             	aRangos.append(rango)
                             	aValores.append(valor)
@@ -330,10 +336,19 @@ class ButtonMulticortes(object):
     ##                        arcpy.AddMessage(k)
                         try:
                                 tabla_cursor=rfinal+"\\"+nombre_tabla
-                                cursorAux = arcpy.SearchCursor("%s"%(tabla_cursor)," %s = '"%(campo_estadisticas)+k+"'",fields ="SUM_Shape_Area")
+                                try:
+                                    cursorAux = arcpy.SearchCursor("%s"%(tabla_cursor)," %s = '"%(campo_estadisticas)+k+"'",fields ="SUM_Shape_Area")
+                                except:
+                                    cursorAux = arcpy.SearchCursor("%s"%(tabla_cursor)," %s = '"%(campo_estadisticas_tentativo)+k+"'",fields ="SUM_Shape_Area")
+
                         except:
                                 tabla_cursor=rfinal+"\\"+nombre_tabla
-                                cursorAux = arcpy.SearchCursor("%s"%(tabla_cursor)," %s = "%(campo_estadisticas)+str(k),fields ="SUM_Shape_Area")
+                                try:
+                                    cursorAux = arcpy.SearchCursor("%s"%(tabla_cursor)," %s = "%(campo_estadisticas)+str(k),fields ="SUM_Shape_Area")
+                                except:
+                                    cursorAux = arcpy.SearchCursor("%s"%(tabla_cursor)," %s = "%(campo_estadisticas_tentativo)+str(k),fields ="SUM_Shape_Area")
+
+
 
                         for f in cursorAux:
                         		aSumatorias.append(f.getValue("SUM_Shape_Area"))
