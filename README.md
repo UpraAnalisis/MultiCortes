@@ -42,10 +42,12 @@ Recuerde mantener pausada la visualización para mejorar el rendimiento y la est
 ### Cargar Capas Necesarias
 
 1. Las capas necesarias para la operación de este addin son de dos (2) tipos y deben estar separadas en diferentes dataframes de la siguiente forma: 
+
 moldes: Este dataframe contiene las capas con las cuales se realizarán los cortes.
 capas: Este dataframe contiene las capas que serán cortadas y sobre las cuales se realizarán las estadísticas.
 
 2. Si se va a realizar un corte con estadísticas o una extracción por campo con estadísticas, deben configurarse para cada capa los campos sobre los cuales se van a sacar las estadísticas. Para ello se escribirán dos guiones al final del nombre de cada capa, seguidos del nombre del campo con el cual se van a hacer las estadísticas. A continuación una imagen que representa lo anteriormente mencionado.
+
 ![Dataframes](/img/confi_nombres.png) 
 
 
