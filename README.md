@@ -28,12 +28,15 @@ Ingresar a la versión de arcgis en la que se quiera instalar el AddIn y pegar e
 ## Configuración
 
 Si al iniciar ArcMap no encuentra el addin debe configurar su visualización dentro de la barra de herramientas. Para ello haga clic derecho sobre la barra de herramientas y seleccione la opción customize. AL hacerlo se mostrará el menú mostrado en la siguiente imágen en donde debe seleccionar la barra de herramientas Upra_Análisis_Tools.
+
 ![Dataframes](/img/activar_menu.png)
 
 ## Uso
 ### Configurar el mxd
 1. Construir tres dataframes con la estructura mostrada en la siguiente imágen:
+
  ![Dataframes](/img/dataframes.PNG)
+ 
 Recuerde mantener pausada la visualización para mejorar el rendimiento y la estabiidad del addin.
 
 ### Cargar Capas Necesarias
