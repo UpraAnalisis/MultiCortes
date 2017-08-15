@@ -35,7 +35,7 @@ Si al iniciar ArcMap no encuentra el addin debe configurar su visualización den
 ### Configurar el mxd
 1. Construir tres dataframes con la estructura mostrada en la siguiente imágen:
 
- ![Dataframes](/img/dataframes.PNG)
+![Dataframes](/img/dataframes.PNG)
  
 Recuerde mantener pausada la visualización para mejorar el rendimiento y la estabiidad del addin.
 
@@ -44,6 +44,7 @@ Recuerde mantener pausada la visualización para mejorar el rendimiento y la est
 1. Las capas necesarias para la operación de este addin son de dos (2) tipos y deben estar separadas en diferentes dataframes de la siguiente forma: 
 
 moldes: Este dataframe contiene las capas con las cuales se realizarán los cortes.
+
 capas: Este dataframe contiene las capas que serán cortadas y sobre las cuales se realizarán las estadísticas.
 
 2. Si se va a realizar un corte con estadísticas o una extracción por campo con estadísticas, deben configurarse para cada capa los campos sobre los cuales se van a sacar las estadísticas. Para ello se escribirán dos guiones al final del nombre de cada capa, seguidos del nombre del campo con el cual se van a hacer las estadísticas. A continuación una imagen que representa lo anteriormente mencionado.
@@ -55,13 +56,9 @@ capas: Este dataframe contiene las capas que serán cortadas y sobre las cuales 
 
 1. Contruir tres dataframes con la estrutura mostrada en la siguiente imágen:
 
-  
+![Select Herramienta](/img/selherr.PNG)
 
-2. .
-
-    ![Select Herramienta](/img/selherr.PNG)
-
-3. Dar Click en el punto de interés que se desea consultar 
+2. Dar Click en el punto de interés que se desea consultar 
 
     ![Dataframes](/img/dataframes.PNG)
 
