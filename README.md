@@ -1,4 +1,4 @@
-# Aptitool AddIn
+# MultiCortes AddIn
 
 Es una herramienta del tipo AddIn que se incorpora a ArcGIS y permite realizar el corte de múltiples capas con respecto a una o varias zonas de interés o moldes y obtener las estadísticas de área de acuerdo con un campo definido. Esta herramienta se desarrolló con el fin de agilizar el proceso de generación de resultados de los geoprocesos adelantados por los profesionales del grupo de análisis, para dar cumplimiento al objeto misisonal de la  [UPRA](http://www.upra.gov.co).
 
@@ -33,9 +33,9 @@ Ingresar a la versión de arcgis en la que se quiera instalar el AddIn y pegar e
 
 ### Selección criterio
 
-1. Seleccionar el criterio en el TOC de ArcGIS
+1. Contruir tres dataframes con la estrutura mostrada en la siguiente imágen
 
-    ![Select Criterio](img/selcriterio.PNG)
+    ![Dataframes](/img/dataframes.PNG)
 
 2. Seleccionar la herramienta
 
@@ -43,7 +43,7 @@ Ingresar a la versión de arcgis en la que se quiera instalar el AddIn y pegar e
 
 3. Dar Click en el punto de interés que se desea consultar 
 
-    ![Select Punto](/img/selpunto.PNG)
+    ![Dataframes](/img/dataframes.PNG)
 
 ### Selección Variables
 
