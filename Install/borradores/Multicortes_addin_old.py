@@ -11,25 +11,12 @@ import locale
 import shutil
 import xlsxwriter
 import easygui
-import pptx
-import pptx.util
-import glob
-import time
 locale.setlocale(locale.LC_ALL,  'C')
 import xlutils
 from xlutils.copy import copy
-from pptx.util import Inches,Pt,Cm
-from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN
-from pptx.enum.shapes import MSO_SHAPE
-from pptx.enum.lang import MSO_LANGUAGE_ID
-arcpy.env.outputCoordinateSystem = arcpy.SpatialReference("MAGNA Colombia Bogota")
 
 import Tkinter, Tkconstants, tkFileDialog
 from Tkinter import *
-
-if not hasattr(sys, 'argv'):
-    sys.argv = ['']
 
 #=========Funciones Auxiliares=====================#
 def getPythonPath():
@@ -60,8 +47,6 @@ else:
     verPython64=pyexe
     verPythonfinal=verPython64
 # ------------------------------------------------------------
-
-
 ruta=""
 verPython32=verPython64.replace("x64","")
 verPythonDir=verPython64.replace("\\python.exe","")
@@ -190,7 +175,7 @@ def calc_area(capas):
         datos_area = []
         datos_capa.append(desc.name)
     for x in xrange(len(datos_area_totales)):
-        print "la capa {} tiene un area de {:.3f} en m2 y {} en ha".format(datos_capa[x],datos_area_totales[x],datos_area_totales[x]/10000)
+        print "la capa {} tiene un area de {} en m2 y {} en ha".format(datos_capa[x],str(datos_area_totales[x]),datos_area_totales[x]/10000)
 
 def calc_ruta(capas):
     for capa in capas:
@@ -309,15 +294,15 @@ class GetUserInput(object):
         self.master = Tk()
 
         self.master.title("Choose from list")
-        self.scrollbar = Scrollbar(self.master, orient=VERTICAL)####
+##        self.scrollbar = Scrollbar(frame, orient=VERTICAL)####
 
-        self.listbox = Listbox(self.master, yscrollcommand=self.scrollbar.set,selectmode=EXTENDED if multiple else SINGLE, width=40, height=20)
-        self.scrollbar.config(command=self.listbox.yview)##
-        self.scrollbar.pack(side=RIGHT, fill=Y)##
+        self.listbox = Listbox(self.master, selectmode=EXTENDED if multiple else SINGLE, width=40, height=20)
+##        self.scrollbar.config(command=listbox.yview)##
+##        self.scrollbar.pack(side=RIGHT, fill=Y)##
         for option in options:
             self.listbox.insert(0, option)
-##        self.listbox.pack()
-        self.listbox.pack(side=LEFT, fill=BOTH, expand=1)##
+        self.listbox.pack()
+##        self.listbox.pack(side=LEFT, fill=BOTH, expand=1)##
 
         b = Button(self.master, command=self.callback, text="Convertir")
         b.pack()
@@ -340,206 +325,6 @@ class GetUserInput(object):
         return self.selection
 
 
-def mExport():
-    import pythonaddins, time
-    orgin= r'' + easygui.fileopenbox("Plantilla","Open File",".pptx",["*.pptx", ["*.ppt", "*.pptx", "PowerPoint Files"]  ])
-    out= r'' + easygui.filesavebox("Resultado","Save File","out.pptx",["*.pptx", ["*.ppt", "*.pptx", "PowerPoint Files"]  ])
-    PNGPath = r'' + easygui.diropenbox("Save Folder","Imagenes Generadas",".")
-    formatoSalida =  easygui.choicebox("Seleccione formato de Salida","Formato",["PNG","JPG","PDF"])
-    resolucionSalida = easygui.integerbox('Resolución 150 - 600 px',' Resolución Salida',300,150,601)
-    t_inicio=time.clock()
-    mxd = arcpy.mapping.MapDocument("CURRENT")
-    df = arcpy.mapping.ListDataFrames(mxd, '')[0]
-    lyrList = pythonaddins.GetSelectedTOCLayerOrDataFrame()
-    prs = pptx.Presentation(orgin)
-    pic_left  = int(prs.slide_width - prs.slide_height)
-    pic_top   = int(0)
-    pic_width = int(prs.slide_height)
-    pic_height = int(prs.slide_height)
-    altoHoja = mxd.pageSize.height
-    anchoHoja = mxd.pageSize.width
-
-    alHojaPulga = altoHoja*0.39370
-    anHojaPulga = anchoHoja*0.39370
-
-    for lyr in arcpy.mapping.ListLayers(mxd, '', df):
-        for layer in lyrList:
-            if lyr.name == layer.name:
-                lyr.visible = False
-    arcpy.RefreshActiveView()
-
-    if formatoSalida == "PNG":
-        for lyr in arcpy.mapping.ListLayers(mxd, '', df):
-            for layer in lyrList:
-                if lyr.name == layer.name:
-                    #pythonaddins.MessageBox("Exportando {} to PNG ".format(lyr.name),"Wait...",)
-                    print "Exportando {} to PNG ".format(lyr.name)
-                    lyr.visible = True
-                    arcpy.RefreshActiveView()
-                    # print mxd, PNGPath+"\\" + lyr.name + ".png","",anHojaPulga,alHojaPulga,int(resolucionSalida)
-                    try:
-                        arcpy.mapping.ExportToPNG(mxd, PNGPath+"\\" + lyr.name + ".png","",anHojaPulga,alHojaPulga,int(resolucionSalida))
-                    except:
-                        try:
-                            arcpy.RefreshActiveView()
-                            arcpy.mapping.ExportToPNG(mxd, PNGPath+"\\" + lyr.name + ".png","",anHojaPulga,alHojaPulga,int(resolucionSalida))
-                        except:
-                            pythonaddins.MessageBox("AttributeError: PageLayoutObject \n\nPlease restart ArcMap and try again , If error persist call to ESRI support","ArcGIS Fatal Error",7)
-                            raise SystemExit(0)
-                    lyr.visible = False
-                    #Agrega imagen a pptx
-                    g = glob.glob(PNGPath+"\\" + lyr.name + ".png")[0]
-                    slide = prs.slides.add_slide(prs.slide_layouts[6])
-                    tb = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Cm(1.51), Cm(4.7), Cm(13) , Cm(2.31))
-                    tb.fill.background()
-                    tb.line.fill.background()
-                    p = tb.text_frame.add_paragraph()
-                    p.alignment = PP_ALIGN.CENTER
-                    p.text = lyr.name
-                    p.font.language_id=MSO_LANGUAGE_ID.SPANISH_COLOMBIA
-                    p.font.size = Pt(24)
-                    p.font.color.rgb = RGBColor(21, 151, 65)
-                    p.font.bold = True
-                    p.font.name = 'Century Gothic'
-                    pic = slide.shapes.add_picture(g, pic_left, pic_top, pic_width, pic_height)
-                    try:
-                        top = 6.8
-                        for i in lyr.symbology.classBreakLabels:
-                            tc = slide.shapes.add_shape(MSO_SHAPE.ROUND_2_SAME_RECTANGLE, Cm(5.45), Cm(top) , Cm(1.16) , Cm(4.16))
-                            tc.rotation = -90.0
-                            tc.line.fill.background()
-                            tc.text_frame.margin_bottom = Cm(0.13)
-                            tc.text_frame.margin_left = Cm(0.25)
-                            tc.text_frame.margin_right = Cm(0.25)
-                            tc.text_frame.margin_top = Cm(0.13)
-                            q = tc.text_frame.add_paragraph()
-                            q.alignment = PP_ALIGN.CENTER
-                            q.text = str(i)
-                            q.font.language_id=MSO_LANGUAGE_ID.SPANISH_COLOMBIA
-                            q.font.size = Pt(14)
-                            q.font.color.rgb = RGBColor(0, 0, 0)
-                            q.font.bold = True
-                            q.font.name = 'Century Gothic'
-                            top += 1.5
-                    except:
-                        print "Group Layer no has Symbology"
-                    del g
-        prs.save(out)
-
-    elif formatoSalida == "PDF":
-        easygui.msgbox("PDF format not supported by PowerPoint integration!!! \n Only Export images")
-        for lyr in arcpy.mapping.ListLayers(mxd, '', df):
-            for layer in lyrList:
-                if lyr.name == layer.name:
-                    #pythonaddins.MessageBox("Exportando {} to PDF ".format(lyr.name),"Wait...")
-                    print "Exportando {} to PDF ".format(lyr.name)
-                    lyr.visible = True
-                    arcpy.RefreshActiveView()
-                    try:
-                        arcpy.mapping.ExportToPDF(mxd, PNGPath+"\\" + lyr.name + ".pdf","",anHojaPulga,alHojaPulga,int(resolucionSalida))
-                    except:
-                        try:
-                            arcpy.RefreshActiveView()
-                            arcpy.mapping.ExportToPDF(mxd, PNGPath+"\\" + lyr.name + ".pdf","PAGE_LAYOUT",anHojaPulga,alHojaPulga,int(resolucionSalida))
-                        except:
-                            pythonaddins.MessageBox("AttributeError: PageLayoutObject \n\nPlease restart ArcMap and try again , If error persist call to ESRI support","ArcGIS Fatal Error",7)
-                            raise SystemExit(0)
-                    lyr.visible = False
-                    try:
-                        #Agrega imagen a pptx
-                        g = glob.glob(PNGPath+"\\" + lyr.name + ".pdf")[0]
-                        print g
-                        slide = prs.slides.add_slide(prs.slide_layouts[6])
-                        tb = slide.shapes.add_textbox(Cm(1.51), Cm(4.7), Cm(13) , Cm(2.31))
-                        p = tb.text_frame.add_paragraph()
-                        p.alignment = PP_ALIGN.CENTER
-                        p.text = lyr.name
-                        p.font.language_id=MSO_LANGUAGE_ID.SPANISH_COLOMBIA
-                        p.font.size = Pt(24)
-                        p.font.color.rgb = RGBColor(21, 151, 65)
-                        p.font.bold = True
-                        p.font.name = 'Century Gothic'
-                        pic = slide.shapes.add_picture(g, pic_left, pic_top, pic_width, pic_height)
-                        try:
-                            tc = slide.shapes.add_textbox(Cm(1.51), Cm(6.7), Cm(13) , Cm(2.31))
-                            q = tc.text_frame.add_paragraph()
-                            q.text = str(lyr.symbology.classBreakLabels)
-                            q.font.language_id=MSO_LANGUAGE_ID.SPANISH_COLOMBIA
-                            q.font.size = Pt(14)
-                            q.font.color.rgb = RGBColor(21, 151, 65)
-                            q.font.bold = True
-                            q.font.name = 'Century Gothic'
-                        except:
-                            print "Group Layer no has Symbology"
-                    except:
-                        print "PDF is not supported by PowerPoint insert"
-                    del g
-        prs.save(out)
-
-
-    else:
-        for lyr in arcpy.mapping.ListLayers(mxd, '', df):
-            for layer in lyrList:
-                if lyr.name == layer.name:
-                    #pythonaddins.MessageBox("Exportando {} to JPG ".format(lyr.name),"Wait...")
-                    print "Exportando {} to JPG ".format(lyr.name)
-                    lyr.visible = True
-                    arcpy.RefreshActiveView()
-                    try:
-                        arcpy.mapping.ExportToJPEG(mxd, PNGPath+"\\" + lyr.name + ".jpg","",anHojaPulga,alHojaPulga,int(resolucionSalida))
-                    except:
-                        try:
-                            arcpy.RefreshActiveView()
-                            arcpy.mapping.ExportToJPEG(mxd, PNGPath+"\\" + lyr.name + ".jpg","PAGE_LAYOUT",anHojaPulga,alHojaPulga,int(resolucionSalida))
-                        except:
-                            pythonaddins.MessageBox("AttributeError: PageLayoutObject \n\nPlease restart ArcMap and try again , If error persist call to ESRI support","ArcGIS Fatal Error",7)
-                            raise SystemExit(0)
-                    lyr.visible = False
-                    #Agrega imagen a pptx
-                    #Agrega imagen a pptx
-                    g = glob.glob(PNGPath+"\\" + lyr.name + ".jpg")[0]
-                    slide = prs.slides.add_slide(prs.slide_layouts[6])
-                    tb = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Cm(1.51), Cm(4.7), Cm(13) , Cm(2.31))
-                    tb.fill.background()
-                    tb.line.fill.background()
-                    p = tb.text_frame.add_paragraph()
-                    p.alignment = PP_ALIGN.CENTER
-                    p.text = lyr.name
-                    p.font.language_id=MSO_LANGUAGE_ID.SPANISH_COLOMBIA
-                    p.font.size = Pt(24)
-                    p.font.color.rgb = RGBColor(21, 151, 65)
-                    p.font.bold = True
-                    p.font.name = 'Century Gothic'
-                    pic = slide.shapes.add_picture(g, pic_left, pic_top, pic_width, pic_height)
-                    try:
-                        top = 6.8
-                        for i in lyr.symbology.classBreakLabels:
-                            tc = slide.shapes.add_shape(MSO_SHAPE.ROUND_2_SAME_RECTANGLE, Cm(5.45), Cm(top) , Cm(1.16) , Cm(4.16))
-                            tc.rotation = -90.0
-                            tc.line.fill.background()
-                            tc.text_frame.margin_bottom = Cm(0.13)
-                            tc.text_frame.margin_left = Cm(0.25)
-                            tc.text_frame.margin_right = Cm(0.25)
-                            tc.text_frame.margin_top = Cm(0.13)
-                            q = tc.text_frame.add_paragraph()
-                            q.alignment = PP_ALIGN.CENTER
-                            q.text = str(i)
-                            q.font.language_id=MSO_LANGUAGE_ID.SPANISH_COLOMBIA
-                            q.font.size = Pt(14)
-                            q.font.color.rgb = RGBColor(0, 0, 0)
-                            q.font.bold = True
-                            q.font.name = 'Century Gothic'
-                            top += 1.5
-                    except:
-                        print "Group Layer no has Symbology"
-                    del g
-        prs.save(out)
-
-    start = t_inicio
-    end = time.clock()
-    hours, rem = divmod(end-start, 3600)
-    minutes, seconds = divmod(rem, 60)
-    print("proceso Completado en {:0>2} H {:0>2} M {:05.2f} S.".format(int(hours),int(minutes),seconds))
 
 
 
@@ -565,9 +350,6 @@ class ButtonArea(object):
         else:
             print" ###### Seleccione por lo menos una capa en el dataframe activo ######"
 
-
-
-
 class ButtonCoordenadas(object):
     """Implementation for UpraToolBar_Coordenadas.button (Button)"""
     def __init__(self):
@@ -589,30 +371,27 @@ class ButtonCoordenadas(object):
         else:
             print "###### Seleccione por lo menos una capa en el dataframe activo ######"
 
-
-
-class ButtonEstadisticas(object):
-    """Implementation for UpraToolBar_Estadisticas.button (Button)"""
+class ButtonRuta(object):
+    """Implementation for UpraToolBar_Ruta.button (Button)"""
     def __init__(self):
         self.enabled = True
         self.checked = False
     def onClick(self):
         capas=pythonaddins.GetSelectedTOCLayerOrDataFrame()
-        if not hasattr(sys, 'argv'):
-            sys.argv  = ['']
         if capas is not None:
             if type(capas)!= list:
                 arr =[]
                 arr.append(capas)
                 capas=arr
-                calc_estadisticas(arr)
+                calc_ruta(arr)
             else:
                 if len(capas)>=1:
-                    calc_estadisticas(capas)
+                    calc_ruta(capas)
                 else:
                     print "###### Seleccione por lo menos una capa en el dataframe activo ######"
         else:
             print "###### Seleccione por lo menos una capa en el dataframe activo ######"
+
 
 class ButtonMulticortes(object):
     """Implementation for UpraToolBar_Presentaciones.ButtonMulticortes (Button)"""
@@ -677,7 +456,7 @@ class ButtonMulticortes(object):
              dialog.title = "Ejecutando Proceso"
              dialog.description = "Procesando."
              dialog.animation = "Spiral"
-##             dialog.progress=0
+             dialog.progress=0
              for molde in lista_molde: ###############################################################################################
                 dialog.description = "Procesando." + str(molde.name.encode("utf8"))
                 if tipo_analisis!=2:
@@ -841,7 +620,7 @@ class ButtonMulticortes(object):
                             raise Exception("Error, Verifique sus datos")
 
                 incremento+=incremento
-                dialog.progress += incremento
+                dialog.progress += incremento*100
                 if tipo_analisis!=2:
                     fusion(ruta_excel_temp,ruta_excel_temp.split("\\")[-1])
                     grafica(ruta_excel_temp+"\\"+ruta_excel_temp.split("\\")[-1]+".xls")
@@ -849,22 +628,24 @@ class ButtonMulticortes(object):
         else:
             pass # Fin de la ejecución el usuario finalizó la ejecución.
 
-class ButtonRuta(object):
-    """Implementation for UpraToolBar_Ruta.button (Button)"""
+class ButtonEstadisticas(object):
+    """Implementation for UpraToolBar_Estadisticas.button (Button)"""
     def __init__(self):
         self.enabled = True
         self.checked = False
     def onClick(self):
         capas=pythonaddins.GetSelectedTOCLayerOrDataFrame()
+        if not hasattr(sys, 'argv'):
+            sys.argv  = ['']
         if capas is not None:
             if type(capas)!= list:
                 arr =[]
                 arr.append(capas)
                 capas=arr
-                calc_ruta(arr)
+                calc_estadisticas(arr)
             else:
                 if len(capas)>=1:
-                    calc_ruta(capas)
+                    calc_estadisticas(capas)
                 else:
                     print "###### Seleccione por lo menos una capa en el dataframe activo ######"
         else:
@@ -877,11 +658,3 @@ class ButtonToExcel(object):
         self.checked = False
     def onClick(self):
         toExcel()
-
-class ButtonToPowerpoint(object):
-    """Implementation for UpraToolBar_Presentaciones.ButtonToPowerpoint (Button)"""
-    def __init__(self):
-        self.enabled = True
-        self.checked = False
-    def onClick(self):
-        mExport()
